@@ -20,7 +20,8 @@ export type SectionId =
   | "hybrid"
   | "electrical"
   | "evidence"
-  | "knowledge";
+  | "knowledge"
+  | "dtc";
 
 export type Section = {
   id: SectionId;

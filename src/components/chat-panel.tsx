@@ -6,16 +6,29 @@ import { newId, useConversation, useSavedFacts, useSources, type ChatMessage } f
 import { extractDtcCodesFromText, type DtcCode } from "@/lib/dtc-codes";
 import type { Section } from "@/lib/vehicle";
 
-export function ChatPanel({ section }: { section: Section }) {
+export function ChatPanel({
+  section,
+  initialInput,
+}: {
+  section: Section;
+  initialInput?: string | undefined;
+}) {
   const [messages, setMessages] = useConversation(section.id);
   const [, setSources] = useSources();
   const [facts, setFacts] = useSavedFacts();
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(initialInput ?? "");
   const [deep, setDeep] = useState(false);
   const [busy, setBusy] = useState(false);
   const [liveSearches, setLiveSearches] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (initialInput) {
+      setInput(initialInput);
+      textareaRef.current?.focus();
+    }
+  }, [initialInput]);
 
   useEffect(() => {
     textareaRef.current?.focus();

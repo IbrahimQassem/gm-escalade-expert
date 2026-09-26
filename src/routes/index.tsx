@@ -6,6 +6,7 @@ import {
   Library,
   MessageSquare,
   Package,
+  ShieldAlert,
   Stethoscope,
   Trash2,
   Wrench,
@@ -14,6 +15,7 @@ import {
 import { useState } from "react";
 
 import { ChatPanel } from "@/components/chat-panel";
+import { DtcLookupPanel } from "@/components/dtc-lookup";
 import { VehicleCard } from "@/components/vehicle-card";
 import { AnswerBody, DecisionCard, parseAnswer } from "@/components/decision";
 import { useSavedFacts, useSources } from "@/lib/store";
@@ -52,6 +54,7 @@ const ICONS: Record<string, React.ElementType> = {
 
 function App() {
   const [active, setActive] = useState<SectionId>("chat");
+  const [prefilledInput, setPrefilledInput] = useState<string | undefined>();
   const section = SECTIONS.find((s) => s.id === active);
 
   return (
@@ -76,6 +79,13 @@ function App() {
             );
           })}
           <button
+            onClick={() => setActive("dtc")}
+            className={`nav-tab ${active === "dtc" ? "nav-tab-active" : ""}`}
+          >
+            <ShieldAlert className="size-4" />
+            أكواد الأعطال (DTC)
+          </button>
+          <button
             onClick={() => setActive("evidence")}
             className={`nav-tab ${active === "evidence" ? "nav-tab-active" : ""}`}
           >
@@ -93,8 +103,19 @@ function App() {
       </nav>
 
       <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-3 py-4 sm:px-5">
-        {section ? (
-          <ChatPanel key={section.id} section={section} />
+        {active === "dtc" ? (
+          <DtcLookupPanel
+            onSelectCode={(code) => {
+              setPrefilledInput(`ما سبب وطريقة تشخيص كود العطل ${code} في إسكاليد هايبرد 2010؟`);
+              setActive("chat");
+            }}
+          />
+        ) : section ? (
+          <ChatPanel
+            key={section.id}
+            section={section}
+            initialInput={active === "chat" ? prefilledInput : undefined}
+          />
         ) : active === "evidence" ? (
           <EvidencePanel />
         ) : (
