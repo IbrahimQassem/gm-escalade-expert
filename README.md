@@ -1,30 +1,37 @@
-# Welcome to your Lovable project
+# GM Escalade 2-Mode Hybrid Expert
 
-This project was built with [Lovable](https://lovable.dev).
+دليل الصيانة التفاعلي والتشخيص الذكي لكاديلاك إسكاليد هايبرد 2010 ونظام 2-Mode Hybrid من جنرال موتورز.
 
-## Build with Lovable
+## Features
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **2-Mode Hybrid Diagnostics**: Comprehensive lookup table and fuzzy search for GM 2-Mode Hybrid DTC trouble codes (P0A80, P0AC4, P0A7F, P0C05, etc.).
+- **Automatic DTC Detection**: Detects trouble codes in natural language queries and displays color-coded diagnostic cards with system info and root causes.
+- **Decision Engine**: High-confidence decision cards, verified technical sources, and knowledge base tracking.
+- **Local AI Provider Support**: Direct integration with local Antigravity CLI and Codex CLI for local, private diagnostics without external API dependencies.
+- **Full Test Suite**: Tested with Vitest and React Testing Library (>94% coverage).
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Prerequisites: Node.js (>=20) and npm.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+git clone https://github.com/IbrahimQassem/gm-escalade-expert.git
+cd gm-escalade-expert
+npm install
 npm run dev
 ```
 
-## Local AI with Antigravity CLI or Codex CLI
+## Testing & Quality Gates
 
-The chat server runs an authenticated CLI installed on the same machine. No
-`LOVABLE_API_KEY` is required.
+```sh
+npm test              # Run all Vitest unit & component tests
+npm run test:coverage # Generate coverage report
+npm run build         # Production SSR build
+```
+
+## Local AI Integration (Antigravity CLI / Codex CLI)
+
+The chat server runs an authenticated CLI installed on the same machine.
 
 Authenticate one or both CLIs first:
 
@@ -45,15 +52,10 @@ To use Codex instead:
 AI_CLI_PROVIDER=codex npm run dev
 ```
 
-The server launches the selected CLI without a shell. Antigravity runs with its
-terminal sandbox enabled, and Codex runs in read-only mode. This integration is
-intended for local development on a trusted machine; a hosted deployment will
-not have access to your local CLI credentials. Production builds target a Node.js
-server because browser and edge runtimes cannot launch local CLI processes.
+## Tech Stack
 
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+- TanStack Start & TanStack Router
+- React 19 & TypeScript
+- Tailwind CSS & Lucide Icons
+- Nitro & Vite
+- Vitest & Testing Library

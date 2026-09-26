@@ -28,7 +28,6 @@ export default defineConfig({
         // chat-panel — streams SSE/AI responses; requires integration test infra
         "src/components/chat-panel.tsx",
         "src/lib/*.server.ts",
-        "src/lib/lovable-error-reporting.ts",
         "src/lib/error-page.ts",
         "src/server.ts",
         "src/routes/**",
