@@ -3,6 +3,7 @@ import {
   DTC_CODES,
   searchDtcCodes,
   getDtcByCode,
+  extractDtcCodesFromText,
   type DtcCode,
 } from "@/lib/dtc-codes";
 
@@ -120,5 +121,49 @@ describe("searchDtcCodes", () => {
     expect(typeof first.description).toBe("string");
     expect(typeof first.system).toBe("string");
     expect(typeof first.severity).toBe("string");
+  });
+});
+
+// ─── extractDtcCodesFromText ──────────────────────────────────────────────────
+
+describe("extractDtcCodesFromText", () => {
+  it("returns empty array when no DTC codes found in text", () => {
+    expect(extractDtcCodesFromText("السيارة تصدر صوتاً غريباً")).toEqual([]);
+  });
+
+  it("extracts a single known DTC code from plain text", () => {
+    const result = extractDtcCodesFromText("عندي كود P0A80 في السيارة");
+    expect(result).toHaveLength(1);
+    expect(result[0]!.code).toBe("P0A80");
+  });
+
+  it("extracts multiple DTC codes from one message", () => {
+    const result = extractDtcCodesFromText("الأكواد عندي: P0A80 و P0C05 و P0171");
+    const codes = result.map((r) => r.code);
+    expect(codes).toContain("P0A80");
+    expect(codes).toContain("P0C05");
+    expect(codes).toContain("P0171");
+  });
+
+  it("is case-insensitive for code detection", () => {
+    const result = extractDtcCodesFromText("كود p0a80 في النظام");
+    expect(result).toHaveLength(1);
+    expect(result[0]!.code).toBe("P0A80");
+  });
+
+  it("returns no results for unknown codes not in DTC_CODES", () => {
+    expect(extractDtcCodesFromText("كود P9999 غير معروف")).toEqual([]);
+  });
+
+  it("does not return duplicates when same code mentioned twice", () => {
+    const result = extractDtcCodesFromText("P0A80 ثم مرة أخرى P0A80");
+    expect(result).toHaveLength(1);
+  });
+
+  it("returns full DtcCode objects (not just strings)", () => {
+    const result = extractDtcCodesFromText("P0A7F");
+    expect(result[0]).toHaveProperty("description");
+    expect(result[0]).toHaveProperty("system");
+    expect(result[0]).toHaveProperty("severity");
   });
 });

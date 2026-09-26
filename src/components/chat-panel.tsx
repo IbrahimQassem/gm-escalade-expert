@@ -1,8 +1,9 @@
-import { BookmarkPlus, Globe, Loader2, Search, SendHorizonal, Trash2 } from "lucide-react";
+import { BookmarkPlus, Globe, Loader2, Search, SendHorizonal, Trash2, AlertTriangle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AnswerBody, DecisionCard, parseAnswer } from "@/components/decision";
 import { newId, useConversation, useSavedFacts, useSources, type ChatMessage } from "@/lib/store";
+import { extractDtcCodesFromText, type DtcCode } from "@/lib/dtc-codes";
 import type { Section } from "@/lib/vehicle";
 
 export function ChatPanel({ section }: { section: Section }) {
@@ -160,8 +161,11 @@ export function ChatPanel({ section }: { section: Section }) {
 
         {messages.map((msg) =>
           msg.role === "user" ? (
-            <div key={msg.id} className="flex justify-start">
-              <div className="user-bubble">{msg.content}</div>
+            <div key={msg.id}>
+              <DtcInlineCards text={msg.content} />
+              <div className="flex justify-start">
+                <div className="user-bubble">{msg.content}</div>
+              </div>
             </div>
           ) : (
             <AssistantMessage key={msg.id} msg={msg} onSave={() => saveFact(msg)} busy={busy} />
@@ -272,6 +276,53 @@ function AssistantMessage({
           حفظ في معرفة السيارة
         </button>
       )}
+    </div>
+  );
+}
+
+// ─── DTC Inline Cards ─────────────────────────────────────────────────────────
+
+const SEVERITY_STYLES: Record<DtcCode["severity"], { bar: string; badge: string }> = {
+  low: { bar: "border-l-4 border-green-500/60", badge: "bg-green-500/10 text-green-400" },
+  medium: { bar: "border-l-4 border-yellow-500/60", badge: "bg-yellow-500/10 text-yellow-400" },
+  high: { bar: "border-l-4 border-orange-500/60", badge: "bg-orange-500/10 text-orange-400" },
+  critical: { bar: "border-l-4 border-red-500/70", badge: "bg-red-500/10 text-red-400" },
+};
+
+export function DtcInlineCards({ text }: { text: string }) {
+  const dtcs = extractDtcCodesFromText(text);
+  if (dtcs.length === 0) return null;
+
+  return (
+    <div className="mb-2 space-y-2" data-testid="dtc-inline-cards">
+      {dtcs.map((dtc) => {
+        const style = SEVERITY_STYLES[dtc.severity];
+        return (
+          <div
+            key={dtc.code}
+            className={`rounded-lg bg-muted/40 p-3 text-start ${style.bar}`}
+            data-testid={`dtc-card-${dtc.code}`}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <AlertTriangle className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="font-mono text-xs font-bold text-foreground">{dtc.code}</span>
+              <span
+                className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${style.badge}`}
+              >
+                {dtc.severity}
+              </span>
+              <span className="text-xs text-muted-foreground">{dtc.system}</span>
+            </div>
+            <p className="mt-1.5 text-xs leading-relaxed text-foreground/80">{dtc.description}</p>
+            {dtc.causes && dtc.causes.length > 0 && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                الأسباب المحتملة:{" "}
+                <span className="text-foreground/70">{dtc.causes.join("، ")}</span>
+              </p>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

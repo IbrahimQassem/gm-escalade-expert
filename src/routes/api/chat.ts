@@ -30,9 +30,9 @@ export const Route = createFileRoute("/api/chat")({
           )
           .join("\n\n");
         const prompt = `${buildSystemPrompt({
-          sectionFocus: body.sectionFocus,
-          deep: body.deep,
-          savedFacts: body.savedFacts,
+          ...(body.sectionFocus !== undefined && { sectionFocus: body.sectionFocus }),
+          ...(body.deep !== undefined && { deep: body.deep }),
+          ...(body.savedFacts !== undefined && { savedFacts: body.savedFacts }),
         })}\n\n## المحادثة\n${transcript}\n\nأجب عن رسالة المستخدم الأخيرة فقط.`;
 
         const stream = new ReadableStream({

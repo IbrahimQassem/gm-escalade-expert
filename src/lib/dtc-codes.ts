@@ -149,3 +149,29 @@ export function searchDtcCodes(query: string): DtcCode[] {
 
   return [...exactCode, ...rest];
 }
+
+/**
+ * Scans free text (user message or chat input) for SAE P-code patterns
+ * and returns the matching `DtcCode` entries from the lookup table.
+ *
+ * - Only returns codes that exist in `DTC_CODES` (unknown codes are ignored).
+ * - Case-insensitive; deduplicates repeated mentions of the same code.
+ * - Returns results in the order they first appear in the text.
+ */
+export function extractDtcCodesFromText(text: string): DtcCode[] {
+  const P_CODE_RE = /\bP[0-9A-Z]{4}\b/gi;
+  const matches = text.match(P_CODE_RE) ?? [];
+
+  const seen = new Set<string>();
+  const results: DtcCode[] = [];
+
+  for (const raw of matches) {
+    const code = raw.toUpperCase();
+    if (seen.has(code)) continue;
+    seen.add(code);
+    const dtc = getDtcByCode(code);
+    if (dtc) results.push(dtc);
+  }
+
+  return results;
+}
