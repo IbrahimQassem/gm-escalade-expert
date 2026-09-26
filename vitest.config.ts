@@ -1,14 +1,17 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  resolve: {
+    // Native tsconfig paths resolution — avoids the vite-tsconfig-paths deprecation warning
+    tsconfigPaths: true,
+  },
   test: {
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    typecheck: { tsconfig: "./tsconfig.test.json" },
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
